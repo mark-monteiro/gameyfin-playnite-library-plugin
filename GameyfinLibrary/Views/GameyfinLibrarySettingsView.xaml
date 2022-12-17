@@ -1,0 +1,42 @@
+﻿<UserControl x:Class="GameyfinLibrary.Views.GameyfinLibrarySettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:GameyfinLibrary.Views"
+             mc:Ignorable="d"
+             d:DesignHeight="400" d:DesignWidth="600"
+             d:DataContext="{d:DesignInstance Type=local:GameyfinLibrarySettingsViewModel, IsDesignTimeCreatable=True}">
+    <UserControl.Resources>
+        <Style x:Key="Style.StackPanel.FormGroup" TargetType="StackPanel">
+            <Setter Property="Margin" Value="0 0 0 15"/>
+        </Style>
+        <Style TargetType="Label" BasedOn="{StaticResource {x:Type Label}}">
+            <Setter Property="Margin" Value="0 0 0 5"/>
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+            <Setter Property="Margin" Value="0 0 0 3"/>
+        </Style>
+        <Style x:Key="Style.TextBlock.HelpText" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Foreground" Value="#6c757d"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
+    </UserControl.Resources>
+    <StackPanel Margin="20">
+        <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
+            <Label Content="Gameyfin URL"/>
+            <TextBox Text="{Binding Settings.GameyfinUrl}"/>
+        </StackPanel>
+
+        <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
+            <Label Content="Platform Filter" />
+            <TextBox Text="{Binding PlatformFilter}"/>
+            <TextBlock 
+                Text="Enter a list of platforms to import, separated by commas. Platforms should be specified via their IGDB slug. Leave this field empty to import all platforms."
+                Style="{StaticResource Style.TextBlock.HelpText}"
+            />
+        </StackPanel>
+    </StackPanel>
+</UserControl>

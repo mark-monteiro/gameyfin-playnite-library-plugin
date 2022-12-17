@@ -1,0 +1,7 @@
+﻿Id: GameyfinLibrary_8a73284a-7f62-4a09-9ac8-e25fcbdaabb3
+Name: Gameyfin library integration
+Author: Mark Monteiro
+Version: 0.0.1
+Module: GameyfinLibrary.dll
+Type: GameLibrary
+Icon: Resources\gameyfin-logo.png
