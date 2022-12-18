@@ -9,9 +9,15 @@ A playnite library plugin for [Gameyfin](https://github.com/grimsi/gameyfin)
 - Authenticate with Gameyfin if it is behind a forward-auth provider like Authelia
 - Download your games as .zip files from the Playnite UI
 
+### What This Addon CAN'T Do (Yet)
+
+- Install games
+- Launch games
+- Track play time
+
 ## Installing
 
-This addon has not yet been published with the [Playnite add-on database](https://github.com/JosefNemec/PlayniteAddonDatabase).
+This addon has not yet been published with the [Playnite add-on database](https://github.com/JosefNemec/PlayniteAddonDatabase) (see #1).
 For now, in order to load the addon, you need to build it manually then load it in Playnite using the developer settings:
 
 1. To build the extension, open the solution in Visual Studio and build it.
