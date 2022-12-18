@@ -145,7 +145,7 @@ namespace GameyfinLibrary.Services
                 }
 
                 // Auth cookie retrieved successfully
-                HandleAuthSuccess(authCookie.Value);
+                HandleAuthSuccess();
             }
             catch (Exception ex)
             {
@@ -153,9 +153,8 @@ namespace GameyfinLibrary.Services
             }
         }
 
-        private void HandleAuthSuccess(string cookieValue)
+        private void HandleAuthSuccess()
         {
-            AuthCookieValue = cookieValue;
             AuthenticateSuccess = true;
             _webView.Close();
         }

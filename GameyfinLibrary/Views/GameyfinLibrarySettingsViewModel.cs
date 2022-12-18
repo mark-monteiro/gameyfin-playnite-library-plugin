@@ -105,10 +105,6 @@ namespace GameyfinLibrary.Views
                     OnPropertyChanged(nameof(AuthenticateSuccess));
                 if (e.PropertyName == nameof(_gameyfinAuthenticator.AuthenticationErrorMessage))
                     OnPropertyChanged(nameof(AuthenticationErrorMessage));
-
-                // Save auth cookie to settings on authentication updates
-                if (e.PropertyName == nameof(_gameyfinAuthenticator.AuthCookieValue))
-                    Settings.AuthCookieValue = _gameyfinAuthenticator.AuthCookieValue;
             };
         }
 

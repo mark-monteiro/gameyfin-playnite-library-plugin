@@ -22,6 +22,7 @@ namespace GameyfinLibrary.Services
         private static readonly ILogger _logger = LogManager.GetLogger(nameof(GameyfinGameFetcher));
 
         private readonly GameyfinLibrarySettings _settings;
+        private readonly IPlayniteAPI _playniteApi;
         private readonly HttpClientHandler _httpClientHandler;
         private readonly HttpClient _httpClient;
 
@@ -29,9 +30,10 @@ namespace GameyfinLibrary.Services
         /// Constructs a new instance of the <see cref="GameyfinGameFetcher"/> class.
         /// </summary>
         /// <param name="settingsVm">The plugin settings.</param>
-        public GameyfinGameFetcher(GameyfinLibrarySettings settings)
+        public GameyfinGameFetcher(GameyfinLibrarySettings settings, IPlayniteAPI playniteApi)
         {
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _playniteApi = playniteApi ?? throw new ArgumentNullException(nameof(playniteApi));
 
             // Create an HTTP client with the Gameyfin server address as the base address
             var baseAddress = new Uri(_settings.GameyfinUrl);
@@ -46,8 +48,19 @@ namespace GameyfinLibrary.Services
             // Set an authentication cookie, if necessary
             if (_settings.AuthMethod == GameyfinAuthMethod.ForwardAuth)
             {
-                var cookie = new Cookie(_settings.AuthCookieName, _settings.AuthCookieValue);
-                _httpClientHandler.CookieContainer.Add(_httpClient.BaseAddress, cookie);
+                using (var webView = _playniteApi.WebViews.CreateOffscreenView())
+                {
+                    // Use the web view to fetch the auth cookie value
+                    var authCookie = webView.GetCookies().FirstOrDefault(x => x.Name == _settings.AuthCookieName);
+                    if (authCookie == null)
+                        throw new InvalidOperationException("Failed to find a Gameyfin auth cookie. You may need to (re)authenticate");
+                    if (authCookie.Expires.HasValue && authCookie.Expires < DateTime.Now)
+                        throw new InvalidOperationException("Gameyfin authentication has expired. You will need to re-authenticate");
+
+                    // Apply the cookie to the HTTP client
+                    var cookie = new Cookie(_settings.AuthCookieName, authCookie.Value);
+                    _httpClientHandler.CookieContainer.Add(_httpClient.BaseAddress, cookie);
+                }
             }
 
             // Send request to fetch games

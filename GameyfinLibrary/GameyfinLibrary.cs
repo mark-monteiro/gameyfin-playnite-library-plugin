@@ -29,15 +29,17 @@ namespace GameyfinLibrary
         public override LibraryClient Client { get; }
 
         private readonly GameyfinLibrarySettingsViewModel _settingsVm;
+        private readonly IPlayniteAPI _playniteApi;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GameyfinLibrary"/> class.
         /// </summary>
-        /// <param name="api">The Playnite API.</param>
-        public GameyfinLibrary(IPlayniteAPI api)
-            : base(api)
+        /// <param name="playniteApi">The Playnite API.</param>
+        public GameyfinLibrary(IPlayniteAPI playniteApi)
+            : base(playniteApi)
         {
-            _settingsVm = new GameyfinLibrarySettingsViewModel(this, api);
+            _settingsVm = new GameyfinLibrarySettingsViewModel(this, playniteApi);
+            _playniteApi = playniteApi;
 
             Client = new GameyfinClient(_settingsVm);
             Properties = new LibraryPluginProperties
@@ -49,7 +51,7 @@ namespace GameyfinLibrary
         /// <inheritdoc/>
         public override IEnumerable<GameMetadata> GetGames(LibraryGetGamesArgs args)
         {
-            using (var gameInfoFetcher = new GameyfinGameFetcher(_settingsVm.Settings))
+            using (var gameInfoFetcher = new GameyfinGameFetcher(_settingsVm.Settings, _playniteApi))
             {
                 return gameInfoFetcher.GetGames(args).Result;
             }
