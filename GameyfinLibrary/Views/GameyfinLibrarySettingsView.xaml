@@ -3,11 +3,15 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:s="clr-namespace:System;assembly=mscorlib"
+             xmlns:gameyfin="clr-namespace:GameyfinLibrary"
              xmlns:local="clr-namespace:GameyfinLibrary.Views"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
              d:DataContext="{d:DesignInstance Type=local:GameyfinLibrarySettingsViewModel, IsDesignTimeCreatable=True}">
     <UserControl.Resources>
+        <s:Boolean x:Key="True">True</s:Boolean>
+        <s:Boolean x:Key="False">False</s:Boolean>
         <Style x:Key="Style.StackPanel.FormGroup" TargetType="StackPanel">
             <Setter Property="Margin" Value="0 0 0 15"/>
         </Style>
@@ -18,25 +22,130 @@
         <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
             <Setter Property="Margin" Value="0 0 0 3"/>
         </Style>
+        <Style x:Key="Style.TextBlock.SectionHeader" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+            <Setter Property="FontSize" Value="20"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Margin" Value="0 10 0 12"/>
+            <Setter Property="TextWrapping" Value="Wrap"/>
+        </Style>
         <Style x:Key="Style.TextBlock.HelpText" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Foreground" Value="#6c757d"/>
             <Setter Property="TextWrapping" Value="Wrap"/>
         </Style>
     </UserControl.Resources>
-    <StackPanel Margin="20">
-        <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
-            <Label Content="Gameyfin URL"/>
-            <TextBox Text="{Binding Settings.GameyfinUrl}"/>
-        </StackPanel>
+    <ScrollViewer Padding="20">
+        <StackPanel>
+            <TextBlock Style="{StaticResource Style.TextBlock.SectionHeader}">
+                General
+            </TextBlock>
 
-        <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
-            <Label Content="Platform Filter" />
-            <TextBox Text="{Binding PlatformFilter}"/>
-            <TextBlock 
-                Text="Enter a list of platforms to import, separated by commas. Platforms should be specified via their IGDB slug. Leave this field empty to import all platforms."
-                Style="{StaticResource Style.TextBlock.HelpText}"
-            />
+            <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
+                <Label Content="Gameyfin URL"/>
+                <TextBox Text="{Binding Settings.GameyfinUrl}"/>
+                <TextBlock 
+                    Text="Enter the base URL of your gameyfin server (i.e. https://my-gameyfin-domain.com)"
+                    Style="{StaticResource Style.TextBlock.HelpText}"
+                />
+            </StackPanel>
+
+            <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
+                <Label Content="Platform Filter" />
+                <TextBox Text="{Binding PlatformFilter}"/>
+                <TextBlock 
+                    Text="Enter a list of platforms to import, separated by commas. Platforms should be specified via their IGDB slug. Leave this field empty to import all platforms."
+                    Style="{StaticResource Style.TextBlock.HelpText}"
+                />
+            </StackPanel>
+
+            <Separator/>
+
+            <TextBlock Style="{StaticResource Style.TextBlock.SectionHeader}">
+                Authentication
+            </TextBlock>
+
+            <!-- Authentication Mode -->
+            <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
+                <Label Content="Authentication Method" />
+                <ComboBox
+                    ItemsSource="{Binding AuthMethodOptions, Mode=OneTime}"
+                    DisplayMemberPath="Value"
+                    SelectedValuePath="Key"
+                    SelectedValue="{Binding Settings.AuthMethod, Mode=TwoWay}"
+                />
+                <TextBlock 
+                    Text="Select the method to use to authenticate with the Gameyfin server."
+                    Style="{StaticResource Style.TextBlock.HelpText}"
+                />
+            </StackPanel>
+
+            <StackPanel>
+
+                <!-- Only show this stack panel when the auth method is set to 'ForwardAuth' -->
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel" BasedOn="{StaticResource Style.StackPanel.FormGroup}">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Settings.AuthMethod}" Value="ForwardAuth">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+
+                <!-- Auth Cookie Name -->
+                <StackPanel Style="{StaticResource Style.StackPanel.FormGroup}">
+                    <Label Content="Authentication Cookie Name" />
+                    <TextBox Text="{Binding Settings.AuthCookieName}"/>
+                    <TextBlock 
+                        Text="Enter the name of the cookie use by the forward authentication provider. For Authelia, this is 'authelia_session'."
+                        Style="{StaticResource Style.TextBlock.HelpText}"
+                    />
+                </StackPanel>
+
+                <Button
+                    Command="{Binding AuthenticateCommand}"
+                    HorizontalAlignment="Left"
+                    Margin="0 0 0 5"
+                >
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Content" Value="Authenticate"/>
+                            <Setter Property="IsEnabled" Value="True"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AuthenticationInProgress}" Value="True">
+                                    <Setter Property="Content" Value="Authenticating..."/>
+                                    <Setter Property="IsEnabled" Value="False"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <TextBlock Text="Authenticated Successfully" FontSize="16" Foreground="Green">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AuthenticateSuccess}" Value="{StaticResource True}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <TextBlock Text="{Binding AuthenticationErrorMessage}" FontSize="16" Foreground="Red">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding AuthenticateSuccess}" Value="{StaticResource False}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

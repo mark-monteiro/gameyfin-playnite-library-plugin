@@ -37,7 +37,7 @@ namespace GameyfinLibrary
         public GameyfinLibrary(IPlayniteAPI api)
             : base(api)
         {
-            _settingsVm = new GameyfinLibrarySettingsViewModel(this);
+            _settingsVm = new GameyfinLibrarySettingsViewModel(this, api);
 
             Client = new GameyfinClient(_settingsVm);
             Properties = new LibraryPluginProperties

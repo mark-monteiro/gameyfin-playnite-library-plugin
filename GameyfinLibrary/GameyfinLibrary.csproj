@@ -50,6 +50,7 @@
     <Compile Include="GameyfinClient.cs" />
     <Compile Include="GameyfinLibrary.cs" />
     <Compile Include="GameyfinLibrarySettings.cs" />
+    <Compile Include="Services\GameyfinWebviewAuthenticator.cs" />
     <Compile Include="Views\GameyfinLibrarySettingsView.xaml.cs">
       <DependentUpon>GameyfinLibrarySettingsView.xaml</DependentUpon>
     </Compile>

@@ -33,14 +33,9 @@ namespace GameyfinLibrary.Services
         {
             _settings = settings ?? throw new ArgumentNullException(nameof(settings));
 
-            // Set an authentication cookie
-            // TODO: Implement forward-auth correctly
-            var baseAddress = new Uri(_settings.GameyfinUrl);
-            var cookieContainer = new CookieContainer();
-            cookieContainer.Add(baseAddress, new Cookie("authelia_session", "rhmAMrQD_ExEZOEFiabr%zNO29M6p7bv"));
-
             // Create an HTTP client with the Gameyfin server address as the base address
-            _httpClientHandler = new HttpClientHandler() { CookieContainer = cookieContainer };
+            var baseAddress = new Uri(_settings.GameyfinUrl);
+            _httpClientHandler = new HttpClientHandler() { CookieContainer = new CookieContainer() };
             _httpClient = new HttpClient(_httpClientHandler) { BaseAddress = baseAddress };
 
         }
@@ -48,6 +43,13 @@ namespace GameyfinLibrary.Services
         /// <inheritdoc cref="LibraryPlugin.GetGames(LibraryGetGamesArgs)"/>
         public async Task<IEnumerable<GameMetadata>> GetGames(LibraryGetGamesArgs args)
         {
+            // Set an authentication cookie, if necessary
+            if (_settings.AuthMethod == GameyfinAuthMethod.ForwardAuth)
+            {
+                var cookie = new Cookie(_settings.AuthCookieName, _settings.AuthCookieValue);
+                _httpClientHandler.CookieContainer.Add(_httpClient.BaseAddress, cookie);
+            }
+
             // Send request to fetch games
             var result = await _httpClient.GetAsync("/v1/games", args.CancelToken);
 
